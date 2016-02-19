@@ -75,12 +75,39 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
 
 
 def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
-    """generates an md5 hash from a dictionary. takes care of extracting
-    lists and arrays properly and avoids rounding errors of
-    floats. makes sure the keys are read in a unique order. a
-    blacklist of keys can be passed, that contain keys which should
-    not be used to generate the hash. if a whitelist is given, only
-    keys appearing in the whitelist are used to generate the hash.
+    """
+    Generate an md5 hash from a (nested) dictionary.
+
+    Takes care of extracting nested dictionaries, lists and arrays and
+    avoids rounding errors of floats. Makes sure keys are read in a
+    unique order. A blacklist of keys can be passed, that can contain
+    keys which should be excluded from the hash. If a whitelist is
+    given, only keys appearing in the whitelist are used to generate
+    the hash.
+
+    Parameters
+    ----------
+    d : dictionary object
+        Dictionary to compute the hash from.
+    blacklist : list, optional
+                List of keys which *are not* used for generating the hash.
+    whitelist : list, optional
+                List of keys which *are* used for generating the hash.
+    raw : bool, optional
+          if True, return the unhashed string.
+
+    Returns
+    -------
+    : string
+      The hash generated from the dictionary, or the unhashed string if
+      raw is True.
+
+    Example
+    -------
+    >>> import dicthash.dicthash as dhsh
+    >>> d = {'a': 'asd', 'b': 0.12, 3: {'c': [3, 4, 5]}}
+    >>> dhsh.generate_hash_from_dict(d)
+    '6725c9cd61278978b124dbd61a1cfb6a'
 
     """
     assert(isinstance(d, dict))
