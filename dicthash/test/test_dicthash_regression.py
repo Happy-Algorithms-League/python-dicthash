@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Unit and integration tests for the dicthash.hash module
+Unit and integration tests for the dicthash.dicthash module
 
 """
 

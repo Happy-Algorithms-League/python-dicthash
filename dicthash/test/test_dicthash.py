@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Unit and integration tests for the dicthash.hash module
+Unit and integration tests for the dicthash.dicthash module
 
 """
 
@@ -10,7 +10,7 @@ import numpy as np
 from .. import dicthash
 
 
-class Dicthash(unittest.TestCase):
+class DictHashTest(unittest.TestCase):
 
     def test_fails_with_non_dict(self):
         self.assertRaises(AssertionError, dicthash.generate_hash_from_dict, 2)
