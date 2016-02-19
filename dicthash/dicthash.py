@@ -25,6 +25,8 @@ def _save_convert_float_to_int(x):
     digit.
 
     """
+    if x < 1. / FLOAT_FACTOR:
+        raise ValueError('Float too small for save conversion to integer.')
     return int(x * FLOAT_FACTOR)
 
 
@@ -51,14 +53,13 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
 
     """
     raw = ''
-    keys = np.sort(d.keys())
     if blacklist is None:
         blacklist = []
 
     if whitelist is None:
-        whitelist = keys
+        whitelist = d.keys()
 
-    for key in whitelist:
+    for key in sorted(whitelist):
         if key not in blacklist:
             value = d[key]
             if isinstance(value, dict):
@@ -110,7 +111,7 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
     '6725c9cd61278978b124dbd61a1cfb6a'
 
     """
-    assert(isinstance(d, dict))
+    assert(isinstance(d, dict)), 'Please provide a dictionary.'
     if blacklist is not None:
         validate_blackwhitelist(d, blacklist)
     if whitelist is not None:
