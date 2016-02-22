@@ -143,3 +143,28 @@ class DictHashTest(unittest.TestCase):
         }
         self.assertRaises(KeyError, dicthash.generate_hash_from_dict, d0, {'blacklist': ['a']})
         self.assertRaises(KeyError, dicthash.generate_hash_from_dict, d0, {'whitelist': ['c']})
+
+    def test_unicode_keys_and_values(self):
+        d0 = {
+            u'é': 'asd',
+            'a': u'é€',
+            'b': 0.1212,
+            3: [6, 7, 9],
+        }
+
+        dicthash.generate_hash_from_dict(d0)
+
+    def test_same_unicode_and_nonunicode_strings_lead_to_same_hash(self):
+        d0 = {
+            'a': 'asd',
+            'b': 0.12,
+        }
+        d1 = {
+            u'a': u'asd',
+            u'b': 0.12,
+        }
+
+        hash0 = dicthash.generate_hash_from_dict(d0)
+        hash1 = dicthash.generate_hash_from_dict(d1)
+
+        self.assertEqual(hash0, hash1)

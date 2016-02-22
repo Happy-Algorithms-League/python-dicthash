@@ -69,3 +69,22 @@ class DictHashRegressionTest(unittest.TestCase):
             3: {'c': [3, 4, 5]}
         }
         dicthash.generate_hash_from_dict(d0)
+
+    def test_unicode_is_used(self):
+        d0 = {
+            u'é': 'asd',
+            'a': u'é€',
+            'b': 0.1212,
+            3: [6, 7, 9],
+        }
+        d1 = {
+            u'€': 'asd',
+            'a': u'é€',
+            'b': 0.1212,
+            3: [6, 7, 9],
+        }
+
+        hash0 = dicthash.generate_hash_from_dict(d0)
+        hash1 = dicthash.generate_hash_from_dict(d1)
+
+        self.assertNotEqual(hash0, hash1)

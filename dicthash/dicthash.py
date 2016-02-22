@@ -38,11 +38,11 @@ def _generate_string_from_list(l):
     raw = ''
     for value in l:
         if isinstance(value, float):
-            raw += str(_save_convert_float_to_int(value))
+            raw += unicode(_save_convert_float_to_int(value))
         elif isinstance(value, (list, np.ndarray)):
             raw += _generate_string_from_list(value)
         else:
-            raw += str(value)
+            raw += unicode(value)
     return raw
 
 
@@ -63,15 +63,15 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
         if key not in blacklist:
             value = d[key]
             if isinstance(value, dict):
-                raw += _generate_string_from_dict(value, blacklist=None, whitelist=None, prefix=prefix.join(str(key)))
+                raw += _generate_string_from_dict(value, blacklist=None, whitelist=None, prefix=prefix + unicode(key))
             else:
-                raw += prefix + str(key)
+                raw += prefix + unicode(key)
                 if isinstance(value, float):
-                    raw += str(_save_convert_float_to_int(value))
+                    raw += unicode(_save_convert_float_to_int(value))
                 elif isinstance(value, (list, np.ndarray)):
                     raw += _generate_string_from_list(value)
                 else:
-                    raw += str(value)
+                    raw += unicode(value)
     return raw
 
 
@@ -84,7 +84,9 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
     unique order. A blacklist of keys can be passed, that can contain
     keys which should be excluded from the hash. If a whitelist is
     given, only keys appearing in the whitelist are used to generate
-    the hash.
+    the hash. All strings are converted to unicode to generate the
+    hash, i.e., the hash does not distinguish between strings provided
+    in ascii or unicode format.
 
     Parameters
     ----------
@@ -120,7 +122,7 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
     if raw:
         return _generate_string_from_dict(d, blacklist, whitelist)
     else:
-        return hashlib.md5(_generate_string_from_dict(d, blacklist, whitelist)).hexdigest()
+        return hashlib.md5(_generate_string_from_dict(d, blacklist, whitelist).encode('utf-8')).hexdigest()
 
 
 def validate_blackwhitelist(d, l):
