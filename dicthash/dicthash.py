@@ -120,7 +120,7 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
         validate_blackwhitelist(d, whitelist)
 
     if raw:
-        return _generate_string_from_dict(d, blacklist, whitelist)
+        return _generate_string_from_dict(d, blacklist, whitelist).encode('utf-8')
     else:
         return hashlib.md5(_generate_string_from_dict(d, blacklist, whitelist).encode('utf-8')).hexdigest()
 

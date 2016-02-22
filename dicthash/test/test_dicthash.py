@@ -65,6 +65,20 @@ class DictHashTest(unittest.TestCase):
 
         dicthash.generate_hash_from_dict(d0)
 
+    def test_proper_flattening_nested_dict_keys(self):
+        d0 = {
+            'a': {
+                'a0': {
+                    'a00': '',
+                    'a01': '',
+                },
+                'a1': '',
+            },
+            'b': '',
+        }
+        expected_raw = u'aa0a00aa0a01aa1b'
+        self.assertEqual(dicthash.generate_hash_from_dict(d0, raw=True), expected_raw)
+
     def test_nested_lists(self):
         d0 = {
             'a': [[1, 2, 3], [4, 5, 6]],
