@@ -53,25 +53,24 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
 
     """
     raw = ''
-    if blacklist is None:
-        blacklist = []
-
     if whitelist is None:
         whitelist = d.keys()
 
+    if blacklist is not None:
+        whitelist = [key for key in whitelist if key not in blacklist]
+
     for key in sorted(whitelist):
-        if key not in blacklist:
-            value = d[key]
-            if isinstance(value, dict):
-                raw += _generate_string_from_dict(value, blacklist=None, whitelist=None, prefix=prefix + unicode(key))
+        value = d[key]
+        if isinstance(value, dict):
+            raw += _generate_string_from_dict(value, blacklist=None, whitelist=None, prefix=prefix + unicode(key))
+        else:
+            raw += prefix + unicode(key)
+            if isinstance(value, float):
+                raw += unicode(_save_convert_float_to_int(value))
+            elif isinstance(value, (list, np.ndarray)):
+                raw += _generate_string_from_list(value)
             else:
-                raw += prefix + unicode(key)
-                if isinstance(value, float):
-                    raw += unicode(_save_convert_float_to_int(value))
-                elif isinstance(value, (list, np.ndarray)):
-                    raw += _generate_string_from_list(value)
-                else:
-                    raw += unicode(value)
+                raw += unicode(value)
     return raw
 
 
