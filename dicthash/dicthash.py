@@ -25,6 +25,8 @@ def _save_convert_float_to_int(x):
     digit.
 
     """
+    if x < 1. / FLOAT_FACTOR:
+        raise ValueError('Float too small for save conversion to integer.')
     return int(x * FLOAT_FACTOR)
 
 
@@ -36,11 +38,11 @@ def _generate_string_from_list(l):
     raw = ''
     for value in l:
         if isinstance(value, float):
-            raw += str(_save_convert_float_to_int(value))
+            raw += unicode(_save_convert_float_to_int(value))
         elif isinstance(value, (list, np.ndarray)):
             raw += _generate_string_from_list(value)
         else:
-            raw += str(value)
+            raw += unicode(value)
     return raw
 
 
@@ -51,48 +53,75 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
 
     """
     raw = ''
-    keys = np.sort(d.keys())
-    if blacklist is None:
-        blacklist = []
-
     if whitelist is None:
-        whitelist = keys
+        whitelist = d.keys()
 
-    for key in whitelist:
-        if key not in blacklist:
-            value = d[key]
-            if isinstance(value, dict):
-                raw += _generate_string_from_dict(value, blacklist=None, whitelist=None, prefix=prefix.join(str(key)))
+    if blacklist is not None:
+        whitelist = [key for key in whitelist if key not in blacklist]
+
+    for key in sorted(whitelist):
+        value = d[key]
+        if isinstance(value, dict):
+            raw += _generate_string_from_dict(value, blacklist=None, whitelist=None, prefix=prefix + unicode(key))
+        else:
+            raw += prefix + unicode(key)
+            if isinstance(value, float):
+                raw += unicode(_save_convert_float_to_int(value))
+            elif isinstance(value, (list, np.ndarray)):
+                raw += _generate_string_from_list(value)
             else:
-                raw += prefix + str(key)
-                if isinstance(value, float):
-                    raw += str(_save_convert_float_to_int(value))
-                elif isinstance(value, (list, np.ndarray)):
-                    raw += _generate_string_from_list(value)
-                else:
-                    raw += str(value)
+                raw += unicode(value)
     return raw
 
 
 def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
-    """generates an md5 hash from a dictionary. takes care of extracting
-    lists and arrays properly and avoids rounding errors of
-    floats. makes sure the keys are read in a unique order. a
-    blacklist of keys can be passed, that contain keys which should
-    not be used to generate the hash. if a whitelist is given, only
-    keys appearing in the whitelist are used to generate the hash.
+    """
+    Generate an md5 hash from a (nested) dictionary.
+
+    Takes care of extracting nested dictionaries, lists and arrays and
+    avoids rounding errors of floats. Makes sure keys are read in a
+    unique order. A blacklist of keys can be passed, that can contain
+    keys which should be excluded from the hash. If a whitelist is
+    given, only keys appearing in the whitelist are used to generate
+    the hash. All strings are converted to unicode to generate the
+    hash, i.e., the hash does not distinguish between strings provided
+    in ascii or unicode format.
+
+    Parameters
+    ----------
+    d : dictionary object
+        Dictionary to compute the hash from.
+    blacklist : list, optional
+                List of keys which *are not* used for generating the hash.
+    whitelist : list, optional
+                List of keys which *are* used for generating the hash.
+    raw : bool, optional
+          if True, return the unhashed string.
+
+    Returns
+    -------
+    : string
+      The hash generated from the dictionary, or the unhashed string if
+      raw is True.
+
+    Example
+    -------
+    >>> import dicthash.dicthash as dhsh
+    >>> d = {'a': 'asd', 'b': 0.12, 3: {'c': [3, 4, 5]}}
+    >>> dhsh.generate_hash_from_dict(d)
+    '6725c9cd61278978b124dbd61a1cfb6a'
 
     """
-    assert(isinstance(d, dict))
+    assert(isinstance(d, dict)), 'Please provide a dictionary.'
     if blacklist is not None:
         validate_blackwhitelist(d, blacklist)
     if whitelist is not None:
         validate_blackwhitelist(d, whitelist)
 
     if raw:
-        return _generate_string_from_dict(d, blacklist, whitelist)
+        return _generate_string_from_dict(d, blacklist, whitelist).encode('utf-8')
     else:
-        return hashlib.md5(_generate_string_from_dict(d, blacklist, whitelist)).hexdigest()
+        return hashlib.md5(_generate_string_from_dict(d, blacklist, whitelist).encode('utf-8')).hexdigest()
 
 
 def validate_blackwhitelist(d, l):
