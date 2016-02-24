@@ -39,8 +39,10 @@ def _generate_string_from_list(l):
     for value in l:
         if isinstance(value, float):
             raw += unicode(_save_convert_float_to_int(value))
-        elif isinstance(value, (list, np.ndarray)):
-            raw += _generate_string_from_list(value)
+        elif isinstance(value, (list, np.ndarray, tuple)):
+                raw += _generate_string_from_list(value)
+        elif isinstance(value, dict):
+            raw += _generate_string_from_dict(value, blacklist=None, whitelist=None)
         else:
             raw += unicode(value)
     return raw
@@ -67,7 +69,7 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
             raw += prefix + unicode(key)
             if isinstance(value, float):
                 raw += unicode(_save_convert_float_to_int(value))
-            elif isinstance(value, (list, np.ndarray)):
+            elif isinstance(value, (list, np.ndarray, tuple)):
                 raw += _generate_string_from_list(value)
             else:
                 raw += unicode(value)
@@ -83,9 +85,11 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
     unique order. A blacklist of keys can be passed, that can contain
     keys which should be excluded from the hash. If a whitelist is
     given, only keys appearing in the whitelist are used to generate
-    the hash. All strings are converted to unicode to generate the
-    hash, i.e., the hash does not distinguish between strings provided
-    in ascii or unicode format.
+    the hash. All strings are converted to unicode, i.e., the hash
+    does not distinguish between strings provided in ascii or unicode
+    format. Lists, np.ndarrays and tuples are treated equaly, i.e., an
+    array-like item [1,2,3], np.array([1,2,3]) or (1,2,3) will lead
+    to the same hash if they are of the same type.
 
     Parameters
     ----------
