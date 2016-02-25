@@ -87,7 +87,7 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
     given, only keys appearing in the whitelist are used to generate
     the hash. All strings are converted to unicode, i.e., the hash
     does not distinguish between strings provided in ascii or unicode
-    format. Lists, np.ndarrays and tuples are treated equaly, i.e., an
+    format. Lists, np.ndarrays and tuples are treated equally, i.e., an
     array-like item [1,2,3], np.array([1,2,3]) or (1,2,3) will lead
     to the same hash if they are of the same type.
 
