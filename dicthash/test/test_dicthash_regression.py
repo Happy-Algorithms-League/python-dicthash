@@ -70,7 +70,7 @@ class DictHashRegressionTest(unittest.TestCase):
         }
         dicthash.generate_hash_from_dict(d0)
 
-    def test_unicode_is_used(self):
+    def test_unicode_is_not_replaced_or_ignored(self):
         d0 = {
             u'é': 'asd',
             'a': u'é€',
@@ -79,7 +79,7 @@ class DictHashRegressionTest(unittest.TestCase):
         }
         d1 = {
             u'€': 'asd',
-            'a': u'é€',
+            'a': u'€é',
             'b': 0.1212,
             3: [6, 7, 9],
         }

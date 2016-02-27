@@ -12,6 +12,32 @@ from .. import dicthash
 
 class DictHashTest(unittest.TestCase):
 
+    def test_dicthash_yields_consistent_result(self):
+        """
+        assures that hash does not change upon internal changes of the
+        module. changes to this test need good reasons as they will
+        (most likely) break all hashes obtained before.
+
+        """
+        d0 = {
+            'a': 'asd',
+            'b': 0.12,
+            3: {
+                'c': [[3, 4, 5], [7, 9, 0]],
+                'z': {
+                    'y': 32.14,
+                },
+            },
+            'd': 367,
+            'e': np.array([[1, 2, np.sqrt(2)], [4, 5]]),
+            'f': (('x', 5), ('y', 0.1)),
+            u'é': u'€',
+            'g': [{'b': 5}, {'c': [1, 2, 3.1415]}],
+        }
+        expected_hash = 'e81c4863ed95dabb53f1decc7dada421'
+        hash0 = dicthash.generate_hash_from_dict(d0)
+        self.assertEqual(expected_hash, hash0)
+
     def test_fails_with_non_dict(self):
         self.assertRaises(AssertionError, dicthash.generate_hash_from_dict, 2)
 
@@ -79,17 +105,57 @@ class DictHashTest(unittest.TestCase):
         expected_raw = u'aa0a00aa0a01aa1b'
         self.assertEqual(dicthash.generate_hash_from_dict(d0, raw=True), expected_raw)
 
+    def test_lists_are_flattened(self):
+        d0 = {
+            'a': [1, 2, 3],
+            'b': [[1, 'x'], [5, 'y', 0.1]],
+            'c': [{'b': 5}, {'c': [1, 2, 3.1415]}],
+        }
+        raw0 = dicthash.generate_hash_from_dict(d0, raw=True)
+        self.assertTrue('(' not in raw0)
+        self.assertTrue('[' not in raw0)
+        self.assertTrue('{' not in raw0)
+
     def test_nested_lists(self):
         d0 = {
-            'a': [[1, 2, 3], [4, 5, 6]],
+            'a': [[1.45, 2, 3], [4, 5, 6]],
             'b': 'asd',
             'c': 1.2,
         }
         dicthash.generate_hash_from_dict(d0)
 
+    def test_tuples_are_flattened(self):
+        d0 = {
+            'a': (1, 2, 3),
+            'b': ((1, 'x'), (5, 'y', 0.1)),
+            'c': ({'b': 5}, {'c': (1, 2, 3.1415)}),
+        }
+        raw0 = dicthash.generate_hash_from_dict(d0, raw=True)
+        self.assertTrue('(' not in raw0)
+        self.assertTrue('[' not in raw0)
+        self.assertTrue('{' not in raw0)
+
+    def test_nested_tuples(self):
+        d0 = {
+            'a': (1, 2, 3),
+            'b': (('x', 2.52), ('y', 1.98)),
+        }
+        dicthash.generate_hash_from_dict(d0)
+
+    def test_numpy_arrays_are_flattened(self):
+        d0 = {
+            'a': np.array([1, 2, 3]),
+            'b': np.array([[1, 'x'], [5, 'y', 0.1]]),
+            'c': np.array([{'b': 5}, {'c': np.array([1, 2, 3.1415])}]),
+        }
+        raw0 = dicthash.generate_hash_from_dict(d0, raw=True)
+        self.assertTrue('(' not in raw0)
+        self.assertTrue('[' not in raw0)
+        self.assertTrue('{' not in raw0)
+
     def test_nested_numpy_arrays(self):
         d0 = {
-            'a': np.array([[1, 2, 3], [4, 5, 6]]),
+            'a': np.array([[1, 2, 3.678], [4, 5, 6]]),
             'b': 'asd',
             'c': 1.2,
         }
@@ -182,3 +248,21 @@ class DictHashTest(unittest.TestCase):
         hash1 = dicthash.generate_hash_from_dict(d1)
 
         self.assertEqual(hash0, hash1)
+
+    def test_lists_array_tuples_are_equal(self):
+        d0 = {
+            'a': [1, 2, 3],
+        }
+        d1 = {
+            'a': np.array([1, 2, 3]),
+        }
+        d2 = {
+            'a': (1, 2, 3),
+        }
+
+        hash0 = dicthash.generate_hash_from_dict(d0)
+        hash1 = dicthash.generate_hash_from_dict(d1)
+        hash2 = dicthash.generate_hash_from_dict(d2)
+
+        self.assertEqual(hash0, hash1)
+        self.assertEqual(hash1, hash2)
