@@ -274,12 +274,12 @@ class DictHashTest(unittest.TestCase):
             'a': 'asd',
             'b': 0.12,
             'c': [3, 4, 5],
-            'd': np.array([[3, 4, 5],[3, 4, 5]]),
-            'e' : True
+            'd': np.array([[3, 4, 5], [3, 4, 5]]),
+            'e': True
         }
         hash0 = dicthash.generate_hash_from_dict(d0)
-        h5.add_to_h5('store_and_rehash_h5py.h5',{'d0':d0},'w')
-        d0 = h5.load_h5('store_and_rehash_h5py.h5','d0')
+        h5.add_to_h5('store_and_rehash_h5py.h5', {'d0': d0}, 'w')
+        d0 = h5.load_h5('store_and_rehash_h5py.h5', 'd0')
         hash1 = dicthash.generate_hash_from_dict(d0)
 
         self.assertEqual(hash0, hash1)
