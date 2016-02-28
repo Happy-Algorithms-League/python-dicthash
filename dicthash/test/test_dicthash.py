@@ -142,6 +142,16 @@ class DictHashTest(unittest.TestCase):
         }
         dicthash.generate_hash_from_dict(d0)
 
+    def test_sets_are_flattened(self):
+        d0 = {
+            'a': {1, 2, 3},
+            'b': {(1, 'x'), (5, 'y', 0.1)},
+        }
+        raw0 = dicthash.generate_hash_from_dict(d0, raw=True)
+        self.assertTrue('(' not in raw0)
+        self.assertTrue('[' not in raw0)
+        self.assertTrue('{' not in raw0)
+
     def test_numpy_arrays_are_flattened(self):
         d0 = {
             'a': np.array([1, 2, 3]),
