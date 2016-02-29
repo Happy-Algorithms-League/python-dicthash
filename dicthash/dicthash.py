@@ -54,9 +54,7 @@ def _generate_string_from_iterable(l):
     if isinstance(l, (str, unicode)):
         return unicode(l)
     else:
-        raw = []
-        for value in l:
-            raw.append(_unpack_value(value))
+        raw = [_unpack_value(value) for value in l]
         return ''.join(raw)
 
 
@@ -66,15 +64,13 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
     dictionaries.
 
     """
-    raw = []
     if whitelist is None:
         whitelist = d.keys()
 
     if blacklist is not None:
         whitelist = [key for key in whitelist if key not in blacklist]
 
-    for key in sorted(whitelist):
-        raw.append(_unpack_value(d[key], prefix + unicode(key)))
+    raw = [_unpack_value(d[key], prefix + unicode(key)) for key in sorted(whitelist)]
     return ''.join(raw)
 
 
