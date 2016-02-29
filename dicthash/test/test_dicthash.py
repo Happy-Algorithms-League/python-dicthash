@@ -9,6 +9,13 @@ import numpy as np
 
 from .. import dicthash
 
+# check whether h5py_wrapper is available
+try:
+    import h5py_wrapper.wrapper as h5w
+    h5py_wrapper_found = True
+except ImportError:
+    h5py_wrapper_found = False
+
 
 class DictHashTest(unittest.TestCase):
 
@@ -276,3 +283,19 @@ class DictHashTest(unittest.TestCase):
 
         self.assertEqual(hash0, hash1)
         self.assertEqual(hash1, hash2)
+
+    @unittest.skipUnless(h5py_wrapper_found, 'No h5py_wrapper found.')
+    def test_store_and_rehash_h5py(self):
+        d0 = {
+            'a': 'asd',
+            'b': 0.12,
+            'c': [3, 4, 5],
+            'd': np.array([[3, 4, 5], [3, 4, 5]]),
+            'e': True
+        }
+        hash0 = dicthash.generate_hash_from_dict(d0)
+        h5w.add_to_h5('store_and_rehash_h5py.h5', {'d0': d0}, 'w')
+        d1 = h5w.load_h5('store_and_rehash_h5py.h5', 'd0')
+        hash1 = dicthash.generate_hash_from_dict(d1)
+
+        self.assertEqual(hash0, hash1)
