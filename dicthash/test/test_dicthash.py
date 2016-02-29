@@ -285,7 +285,7 @@ class DictHashTest(unittest.TestCase):
         }
         hash0 = dicthash.generate_hash_from_dict(d0)
         h5w.add_to_h5('store_and_rehash_h5py.h5', {'d0': d0}, 'w')
-        d0 = h5w.load_h5('store_and_rehash_h5py.h5', 'd0')
-        hash1 = dicthash.generate_hash_from_dict(d0)
+        d1 = h5w.load_h5('store_and_rehash_h5py.h5', 'd0')
+        hash1 = dicthash.generate_hash_from_dict(d1)
 
         self.assertEqual(hash0, hash1)
