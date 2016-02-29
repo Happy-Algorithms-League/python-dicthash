@@ -24,7 +24,7 @@ def _save_convert_float_to_int(x):
     digit.
 
     """
-    if x < 1. / FLOAT_FACTOR:
+    if abs(x) > 0. and abs(x) < 1. / FLOAT_FACTOR:
         raise ValueError('Float too small for save conversion to integer.')
     return int(x * FLOAT_FACTOR)
 
