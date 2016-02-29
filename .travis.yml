@@ -11,10 +11,10 @@ before_install:
   - ./miniconda.sh -b
   - export PATH=$HOME/miniconda2/bin:$PATH
   - conda update --yes conda
-  - mkdir $HOME/opt/
-  - cd $HOME/opt && git clone --quiet --depth 5 https://github.com/INM-6/h5py_wrapper.git
-  - export PYTHONPATH=$HOME/opt/:$PYTHONPATH
+  - cd ../ && git clone --quiet --depth 5 https://github.com/INM-6/h5py_wrapper.git && cd python-dicthash/
+  - export PYTHONPATH=$PWD/../:$PYTHONPATH
 install:
   - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy nose h5py
+  - pip install --upgrade quantities
 script:
   - nosetests
