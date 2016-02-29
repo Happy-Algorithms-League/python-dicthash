@@ -13,7 +13,6 @@ generate_hash_from_dict - generate an md5 hash from a (nested) dictionary
 
 """
 
-import numpy as np
 import hashlib
 
 FLOAT_FACTOR = 1e15
@@ -30,22 +29,35 @@ def _save_convert_float_to_int(x):
     return int(x * FLOAT_FACTOR)
 
 
-def _generate_string_from_list(l):
+def _unpack_value(value, prefix=''):
+        try:
+            return _generate_string_from_dict(value, blacklist=None, whitelist=None, prefix=prefix)
+        except AttributeError:
+            # not a dict
+            try:
+                return prefix + _generate_string_from_iterable(value)
+            except TypeError:
+                # not an iterable
+                if isinstance(value, float):
+                    return prefix + unicode(_save_convert_float_to_int(value))
+                else:
+                    return prefix + unicode(value)
+
+
+def _generate_string_from_iterable(l):
     """convert a list to a string, by extracting every value. takes care
     of proper handling of floats to avoid rounding errors.
 
     """
-    raw = ''
-    for value in l:
-        if isinstance(value, float):
-            raw += unicode(_save_convert_float_to_int(value))
-        elif isinstance(value, (list, np.ndarray, tuple)):
-                raw += _generate_string_from_list(value)
-        elif isinstance(value, dict):
-            raw += _generate_string_from_dict(value, blacklist=None, whitelist=None)
-        else:
-            raw += unicode(value)
-    return raw
+    # we need to handle strings separately to avoid infinite recursion
+    # due to their iterable property
+    if isinstance(l, (str, unicode)):
+        return unicode(l)
+    else:
+        raw = []
+        for value in l:
+            raw.append(_unpack_value(value))
+        return ''.join(raw)
 
 
 def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
@@ -54,7 +66,7 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
     dictionaries.
 
     """
-    raw = ''
+    raw = []
     if whitelist is None:
         whitelist = d.keys()
 
@@ -62,18 +74,8 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
         whitelist = [key for key in whitelist if key not in blacklist]
 
     for key in sorted(whitelist):
-        value = d[key]
-        if isinstance(value, dict):
-            raw += _generate_string_from_dict(value, blacklist=None, whitelist=None, prefix=prefix + unicode(key))
-        else:
-            raw += prefix + unicode(key)
-            if isinstance(value, float):
-                raw += unicode(_save_convert_float_to_int(value))
-            elif isinstance(value, (list, np.ndarray, tuple)):
-                raw += _generate_string_from_list(value)
-            else:
-                raw += unicode(value)
-    return raw
+        raw.append(_unpack_value(d[key], prefix + unicode(key)))
+    return ''.join(raw)
 
 
 def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
