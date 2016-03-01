@@ -24,8 +24,8 @@ def _save_convert_float_to_int(x):
     digit.
 
     """
-    if x < 1. / FLOAT_FACTOR:
-        raise ValueError('Float too small for save conversion to integer.')
+    if abs(x) > 0. and abs(x) < 1. / FLOAT_FACTOR:
+        raise ValueError('Float too small for safe conversion to integer.')
     return int(x * FLOAT_FACTOR)
 
 
@@ -54,9 +54,7 @@ def _generate_string_from_iterable(l):
     if isinstance(l, (str, unicode)):
         return unicode(l)
     else:
-        raw = []
-        for value in l:
-            raw.append(_unpack_value(value))
+        raw = [_unpack_value(value) for value in l]
         return ''.join(raw)
 
 
@@ -66,15 +64,13 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
     dictionaries.
 
     """
-    raw = []
     if whitelist is None:
         whitelist = d.keys()
 
     if blacklist is not None:
         whitelist = [key for key in whitelist if key not in blacklist]
 
-    for key in sorted(whitelist):
-        raw.append(_unpack_value(d[key], prefix + unicode(key)))
+    raw = [_unpack_value(d[key], prefix + unicode(key)) for key in sorted(whitelist)]
     return ''.join(raw)
 
 

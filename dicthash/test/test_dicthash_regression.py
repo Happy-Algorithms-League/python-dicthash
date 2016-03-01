@@ -40,8 +40,17 @@ class DictHashRegressionTest(unittest.TestCase):
             'a': 1e-16,
         }
 
+        d2 = {
+            'a': -1e-15,
+        }
+        d3 = {
+            'a': -1e-16,
+        }
+
         dicthash.generate_hash_from_dict(d0)
         self.assertRaises(ValueError, dicthash.generate_hash_from_dict, d1)
+        dicthash.generate_hash_from_dict(d2)
+        self.assertRaises(ValueError, dicthash.generate_hash_from_dict, d3)
 
     def test_shuffled_whitelist_leads_to_same_hash(self):
         d0 = {
@@ -88,3 +97,20 @@ class DictHashRegressionTest(unittest.TestCase):
         hash1 = dicthash.generate_hash_from_dict(d1)
 
         self.assertNotEqual(hash0, hash1)
+
+    def test_storing_zero(self):
+        d0 = {
+            'a': 0,
+            'b': 0.,
+            'c': [0, 0.],
+        }
+
+        dicthash.generate_hash_from_dict(d0)
+
+    def test_storing_negative_number(self):
+        d0 = {
+            'a': -1,
+            'b': -1.,
+        }
+
+        dicthash.generate_hash_from_dict(d0)
