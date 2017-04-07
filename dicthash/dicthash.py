@@ -13,10 +13,14 @@ generate_hash_from_dict - generate an md5 hash from a (nested) dictionary
 
 """
 
+from future.builtins import str
 import hashlib
-
 FLOAT_FACTOR = 1e15
 
+try:
+    basestring  # attempt to evaluate basestring
+except NameError:
+    basestring = str
 
 def _save_convert_float_to_int(x):
     """convert a float x to and int. avoid rounding errors on different
@@ -39,9 +43,9 @@ def _unpack_value(value, prefix=''):
             except TypeError:
                 # not an iterable
                 if isinstance(value, float):
-                    return prefix + unicode(_save_convert_float_to_int(value))
+                    return prefix + str(_save_convert_float_to_int(value))
                 else:
-                    return prefix + unicode(value)
+                    return prefix + str(value)
 
 
 def _generate_string_from_iterable(l):
@@ -51,8 +55,8 @@ def _generate_string_from_iterable(l):
     """
     # we need to handle strings separately to avoid infinite recursion
     # due to their iterable property
-    if isinstance(l, (str, unicode)):
-        return unicode(l)
+    if isinstance(l, basestring):
+        return str(l)
     else:
         raw = [_unpack_value(value) for value in l]
         return ''.join(raw)
@@ -66,11 +70,10 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
     """
     if whitelist is None:
         whitelist = d.keys()
-
     if blacklist is not None:
         whitelist = [key for key in whitelist if key not in blacklist]
-
-    raw = [_unpack_value(d[key], prefix + unicode(key)) for key in sorted(whitelist)]
+    # Sort whitelist according to the keys converted to str
+    raw = [_unpack_value(d[key], prefix + str(key)) for key in sorted(whitelist, key=str)]
     return ''.join(raw)
 
 
@@ -119,16 +122,16 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
         validate_blackwhitelist(d, blacklist)
     if whitelist is not None:
         validate_blackwhitelist(d, whitelist)
-
+    raw_string = _generate_string_from_dict(d, blacklist, whitelist)
     if raw:
-        return _generate_string_from_dict(d, blacklist, whitelist).encode('utf-8')
+        return raw_string
     else:
-        return hashlib.md5(_generate_string_from_dict(d, blacklist, whitelist).encode('utf-8')).hexdigest()
+        return hashlib.md5(raw_string.encode('utf-8')).hexdigest()
 
 
 def validate_blackwhitelist(d, l):
     """validates that all entries in black/whitelist l, appear in the
     dictionary d"""
     for key in l:
-        if key not in d.keys():
+        if key not in d:
             raise KeyError('Key "%s" not found in dictionary. Invalid black/whitelist.' % (key))
