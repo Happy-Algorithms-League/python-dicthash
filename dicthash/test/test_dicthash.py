@@ -46,7 +46,7 @@ class DictHashTest(unittest.TestCase):
         self.assertEqual(expected_hash, hash0)
 
     def test_fails_with_non_dict(self):
-        self.assertRaises(AssertionError, dicthash.generate_hash_from_dict, 2)
+        self.assertRaises(TypeError, dicthash.generate_hash_from_dict, 2)
 
     def test_same_value_for_same_dict(self):
         d0 = {
