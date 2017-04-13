@@ -22,6 +22,7 @@ try:
 except NameError:
     basestring = str
 
+
 def _save_convert_float_to_int(x):
     """convert a float x to and int. avoid rounding errors on different
     platforms by shifting the floating point behind the last relevant
@@ -58,8 +59,7 @@ def _generate_string_from_iterable(l):
     if isinstance(l, basestring):
         return str(l)
     else:
-        raw = [_unpack_value(value) for value in l]
-        return ''.join(raw)
+        return ''.join(_unpack_value(value) for value in l)
 
 
 def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
@@ -71,10 +71,10 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
     if whitelist is None:
         whitelist = d.keys()
     if blacklist is not None:
-        whitelist = [key for key in whitelist if key not in blacklist]
+        whitelist = (key for key in whitelist if key not in blacklist)
+
     # Sort whitelist according to the keys converted to str
-    raw = [_unpack_value(d[key], prefix + str(key)) for key in sorted(whitelist, key=str)]
-    return ''.join(raw)
+    return ''.join(_unpack_value(d[key], prefix=prefix + str(key)) for key in sorted(whitelist, key=str))
 
 
 def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
