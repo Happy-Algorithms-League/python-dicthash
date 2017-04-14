@@ -117,7 +117,9 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
     '6725c9cd61278978b124dbd61a1cfb6a'
 
     """
-    assert(isinstance(d, dict)), 'Please provide a dictionary.'
+    if not isinstance(d, dict):
+        raise TypeError('Please provide a dictionary.')
+
     if blacklist is not None:
         validate_blackwhitelist(d, blacklist)
     if whitelist is not None:
@@ -134,4 +136,4 @@ def validate_blackwhitelist(d, l):
     dictionary d"""
     for key in l:
         if key not in d:
-            raise KeyError('Key "%s" not found in dictionary. Invalid black/whitelist.' % (key))
+            raise KeyError('Key "{key}" not found in dictionary. Invalid black/whitelist.'.format(key=key))
