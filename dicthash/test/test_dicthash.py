@@ -237,7 +237,7 @@ def test_invalid_blackwhitelist_raises_error():
         'a': 5,
     }
     with pytest.raises(KeyError):
-        dicthash.generate_hash_from_dict(d0, blacklist=['a'])
+        dicthash.generate_hash_from_dict(d0, blacklist=['c'])
     with pytest.raises(KeyError):
         dicthash.generate_hash_from_dict(d0, whitelist=['c'])
 
