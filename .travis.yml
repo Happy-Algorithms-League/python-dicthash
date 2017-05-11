@@ -16,7 +16,8 @@ before_install:
   - pip install --upgrade pip
 install:
   - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy nose h5py
-  - pip install --upgrade quantities future
+  - pip install --upgrade quantities future pytest
   - pip install h5py_wrapper
+
 script:
-  - nosetests
+  - pytest
