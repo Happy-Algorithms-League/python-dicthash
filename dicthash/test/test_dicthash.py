@@ -332,6 +332,12 @@ def test_dict_list_lead_to_different_hash():
     hash0 = dicthash.generate_hash_from_dict(d0)
     hash1 = dicthash.generate_hash_from_dict(d1)
 
-    raw0 = 'daib5'
-    raw1 = 'dadb5'
+    expected_raw0 = 'daib5'
+    expected_raw1 = 'dadb5'
+
+    raw0 = dicthash._generate_string_from_dict(d0, None, None, prefix='d')
+    raw1 = dicthash._generate_string_from_dict(d1, None, None, prefix='d')
+
+    assert(raw0 == expected_raw0)
+    assert(raw1 == expected_raw1)
     assert(hash0 != hash1)
