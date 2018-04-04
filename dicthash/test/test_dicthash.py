@@ -38,7 +38,7 @@ def test_dicthash_yields_consistent_result():
         u'é': u'€',
         'g': [{'b': 5}, {'c': [1, 2, 3.1415]}],
     }
-    expected_hash = 'e81c4863ed95dabb53f1decc7dada421'
+    expected_hash = 'e7147bd1aab5fa6d4c56309d956e1e38'
     hash0 = dicthash.generate_hash_from_dict(d0)
     assert(expected_hash == hash0)
 
@@ -107,7 +107,7 @@ def test_proper_flattening_nested_dict_keys():
         },
         'b': '',
     }
-    expected_raw = u'aa0a00aa0a01aa1b'
+    expected_raw = u'dada0da00idada0da01idada1idbi'
     assert(dicthash.generate_hash_from_dict(d0, raw=True) == expected_raw)
 
 def test_lists_are_flattened():
@@ -299,3 +299,18 @@ def test_store_and_rehash_h5py():
     hash1 = dicthash.generate_hash_from_dict(d1)
 
     assert(hash0 == hash1)
+
+
+def test_dict_list_lead_to_different_hash():
+    d0 = {
+        'a': ['b', 5],
+    }
+    d1 = {
+        'a': {'b': 5},
+    }
+    hash0 = dicthash.generate_hash_from_dict(d0)
+    hash1 = dicthash.generate_hash_from_dict(d1)
+
+    raw0 = 'daib5'
+    raw1 = 'dadb5'
+    assert(hash0 != hash1)

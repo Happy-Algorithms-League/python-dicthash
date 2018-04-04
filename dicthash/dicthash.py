@@ -46,11 +46,11 @@ def _save_convert_float_to_int(x):
 
 def _unpack_value(value, prefix=''):
         try:
-            return _generate_string_from_dict(value, blacklist=None, whitelist=None, prefix=prefix)
+            return _generate_string_from_dict(value, blacklist=None, whitelist=None, prefix=prefix + 'd')
         except AttributeError:
             # not a dict
             try:
-                return prefix + _generate_string_from_iterable(value)
+                return prefix + _generate_string_from_iterable(value, prefix='i')
             except TypeError:
                 # not an iterable
                 if isinstance(value, float):
@@ -59,7 +59,7 @@ def _unpack_value(value, prefix=''):
                     return prefix + str(value)
 
 
-def _generate_string_from_iterable(l):
+def _generate_string_from_iterable(l, prefix=''):
     """convert a list to a string, by extracting every value. takes care
     of proper handling of floats to avoid rounding errors.
 
@@ -67,9 +67,9 @@ def _generate_string_from_iterable(l):
     # we need to handle strings separately to avoid infinite recursion
     # due to their iterable property
     if isinstance(l, basestring):
-        return str(l)
+        return ''.join((prefix, str(l)))
     else:
-        return ''.join(_unpack_value(value) for value in l)
+        return ''.join(_unpack_value(value, prefix='') for value in l)
 
 
 def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
@@ -84,7 +84,8 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
         whitelist = (key for key in whitelist if key not in blacklist)
 
     # Sort whitelist according to the keys converted to str
-    return ''.join(_unpack_value(d[key], prefix=prefix + str(key)) for key in sorted(whitelist, key=str))
+    return ''.join(_unpack_value(d[key], prefix=prefix + str(key)) for
+                   key in sorted(whitelist, key=str))
 
 
 def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
@@ -134,7 +135,7 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
         validate_blackwhitelist(d, blacklist)
     if whitelist is not None:
         validate_blackwhitelist(d, whitelist)
-    raw_string = _generate_string_from_dict(d, blacklist, whitelist)
+    raw_string = _generate_string_from_dict(d, blacklist, whitelist, prefix='d')
     if raw:
         return raw_string
     else:
