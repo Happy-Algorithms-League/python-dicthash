@@ -16,6 +16,7 @@ try:
 except ImportError:
     h5py_wrapper_found = False
 
+
 def test_dicthash_yields_consistent_result():
     """
     assures that hash does not change upon internal changes of the
@@ -42,9 +43,11 @@ def test_dicthash_yields_consistent_result():
     hash0 = dicthash.generate_hash_from_dict(d0)
     assert(expected_hash == hash0)
 
+
 def test_fails_with_non_dict():
     with pytest.raises(TypeError):
         dicthash.generate_hash_from_dict(2)
+
 
 def test_same_value_for_same_dict():
     d0 = {
@@ -63,6 +66,7 @@ def test_same_value_for_same_dict():
 
     assert(hash0 == hash1)
 
+
 def test_different_value_for_different_dict():
     d0 = {
         'a': [1, 2, 3],
@@ -80,6 +84,7 @@ def test_different_value_for_different_dict():
 
     assert(hash0 != hash1)
 
+
 def test_nested_dictionary():
     d0 = {
         'a': {
@@ -96,6 +101,7 @@ def test_nested_dictionary():
 
     dicthash.generate_hash_from_dict(d0)
 
+
 def test_proper_flattening_nested_dict_keys():
     d0 = {
         'a': {
@@ -110,6 +116,7 @@ def test_proper_flattening_nested_dict_keys():
     expected_raw = u'dada0da00idada0da01idada1idbi'
     assert(dicthash.generate_hash_from_dict(d0, raw=True) == expected_raw)
 
+
 def test_lists_are_flattened():
     d0 = {
         'a': [1, 2, 3],
@@ -121,6 +128,7 @@ def test_lists_are_flattened():
     assert('[' not in raw0)
     assert('{' not in raw0)
 
+
 def test_nested_lists():
     d0 = {
         'a': [[1.45, 2, 3], [4, 5, 6]],
@@ -128,6 +136,7 @@ def test_nested_lists():
         'c': 1.2,
     }
     dicthash.generate_hash_from_dict(d0)
+
 
 def test_tuples_are_flattened():
     d0 = {
@@ -140,12 +149,14 @@ def test_tuples_are_flattened():
     assert('[' not in raw0)
     assert('{' not in raw0)
 
+
 def test_nested_tuples():
     d0 = {
         'a': (1, 2, 3),
         'b': (('x', 2.52), ('y', 1.98)),
     }
     dicthash.generate_hash_from_dict(d0)
+
 
 def test_sets_are_flattened():
     d0 = {
@@ -156,6 +167,7 @@ def test_sets_are_flattened():
     assert('(' not in raw0)
     assert('[' not in raw0)
     assert('{' not in raw0)
+
 
 def test_numpy_arrays_are_flattened():
     d0 = {
@@ -168,6 +180,7 @@ def test_numpy_arrays_are_flattened():
     assert('[' not in raw0)
     assert('{' not in raw0)
 
+
 def test_nested_numpy_arrays():
     d0 = {
         'a': np.array([[1, 2, 3.678], [4, 5, 6]]),
@@ -176,6 +189,7 @@ def test_nested_numpy_arrays():
     }
     dicthash.generate_hash_from_dict(d0)
 
+
 def test_integer_keys():
     d0 = {
         0: [1, 2, 3],
@@ -183,6 +197,7 @@ def test_integer_keys():
         2: 1.2,
     }
     dicthash.generate_hash_from_dict(d0)
+
 
 def test_blacklist():
     d0 = {
@@ -208,6 +223,7 @@ def test_blacklist():
 
     assert(hash0 != hash1)
 
+
 def test_whitelist():
     d0 = {
         'a': [1, 2, 3],
@@ -232,6 +248,7 @@ def test_whitelist():
 
     assert(hash0 != hash1)
 
+
 def test_invalid_blackwhitelist_raises_error():
     d0 = {
         'a': 5,
@@ -240,6 +257,7 @@ def test_invalid_blackwhitelist_raises_error():
         dicthash.generate_hash_from_dict(d0, blacklist=['c'])
     with pytest.raises(KeyError):
         dicthash.generate_hash_from_dict(d0, whitelist=['c'])
+
 
 def test_unicode_keys_and_values():
     d0 = {
@@ -250,6 +268,7 @@ def test_unicode_keys_and_values():
     }
 
     dicthash.generate_hash_from_dict(d0)
+
 
 def test_same_unicode_and_nonunicode_strings_lead_to_same_hash():
     d0 = {
@@ -265,6 +284,7 @@ def test_same_unicode_and_nonunicode_strings_lead_to_same_hash():
     hash1 = dicthash.generate_hash_from_dict(d1)
 
     assert(hash0 == hash1)
+
 
 def test_lists_array_tuples_are_equal():
     d0 = {
@@ -283,6 +303,7 @@ def test_lists_array_tuples_are_equal():
 
     assert(hash0 == hash1)
     assert(hash1 == hash2)
+
 
 @pytest.mark.skipif(not h5py_wrapper_found, reason='No h5py_wrapper found.')
 def test_store_and_rehash_h5py():
