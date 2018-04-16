@@ -294,8 +294,8 @@ def test_store_and_rehash_h5py():
         'e': True
     }
     hash0 = dicthash.generate_hash_from_dict(d0)
-    h5w.add_to_h5('store_and_rehash_h5py.h5', {'d0': d0}, 'w')
-    d1 = h5w.load_h5('store_and_rehash_h5py.h5', 'd0')
+    h5w.save('store_and_rehash_h5py.h5', {'d0': d0}, 'w')
+    d1 = h5w.load('store_and_rehash_h5py.h5', 'd0')
     hash1 = dicthash.generate_hash_from_dict(d1)
 
     assert(hash0 == hash1)
