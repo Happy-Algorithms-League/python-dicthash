@@ -6,7 +6,7 @@ Conveniently generate portable md5 hashes from (arbitrarily nested) dictionaries
 It exposes just a single function to the user `dicthash.generate_hash_from_dict`.
 
 ![Python2.7](https://img.shields.io/badge/python-2.7-blue.svg)
-![Python3.5](https://img.shields.io/badge/python-3.5-blue.svg)
+![Python3.6](https://img.shields.io/badge/python-3.6-blue.svg)
 
 Code status
 ===========
