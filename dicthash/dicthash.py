@@ -71,13 +71,17 @@ def _unpack_value(value, prefix=''):
     except AttributeError:
         # not a dict
         try:
-            return prefix + _generate_string_from_iterable(value)
-        except TypeError:
-            # not an iterable
-            if isinstance(value, float):
-                return prefix + str(_save_convert_float_to_int(value))
-            else:
-                return prefix + str(value)
+            return _generate_string_from_dict(value, blacklist=None, whitelist=None, prefix=prefix + 'd')
+        except AttributeError:
+            # not a dict
+            try:
+                return prefix + _generate_string_from_iterable(value, prefix='i')
+            except TypeError:
+                # not an iterable
+                if isinstance(value, float):
+                    return prefix + str(_save_convert_float_to_int(value))
+                else:
+                    return prefix + str(value)
 
 
 def _generate_string_from_iterable(l):
@@ -94,9 +98,9 @@ def _generate_string_from_iterable(l):
     # we need to handle strings separately to avoid infinite recursion
     # due to their iterable property
     if isinstance(l, basestring):
-        return str(l)
+        return ''.join((prefix, str(l)))
     else:
-        return ''.join(_unpack_value(value) for value in l)
+        return ''.join(_unpack_value(value, prefix='') for value in l)
 
 
 def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
@@ -176,7 +180,7 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None,
         validate_blackwhitelist(d, blacklist)
     if whitelist is not None:
         validate_blackwhitelist(d, whitelist)
-    raw_string = _generate_string_from_dict(d, blacklist, whitelist)
+    raw_string = _generate_string_from_dict(d, blacklist, whitelist, prefix='d')
     if raw:
         return raw_string
     else:
