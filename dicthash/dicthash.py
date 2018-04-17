@@ -49,7 +49,7 @@ def _save_convert_float_to_int(x):
     return int(x * FLOAT_FACTOR)
 
 
-def _unpack_value(value, prefix=''):
+def _unpack_value(value, prefix='', whitelist=None, blacklist=None):
     """
     Unpack values from a data structure and convert to string. Call
     the corresponding functions for dict or iterables or use simple
@@ -63,28 +63,25 @@ def _unpack_value(value, prefix=''):
         Prefix to preprend to resulting string. Defaults to empty
         string.
     """
+
     try:
         return _generate_string_from_dict(value,
-                                          blacklist=None,
-                                          whitelist=None,
-                                          prefix=prefix)
+                                          blacklist=blacklist,
+                                          whitelist=whitelist,
+                                          prefix=prefix + 'd')
     except AttributeError:
         # not a dict
         try:
-            return _generate_string_from_dict(value, blacklist=None, whitelist=None, prefix=prefix + 'd')
-        except AttributeError:
-            # not a dict
-            try:
-                return prefix + _generate_string_from_iterable(value, prefix='i')
-            except TypeError:
-                # not an iterable
-                if isinstance(value, float):
-                    return prefix + str(_save_convert_float_to_int(value))
-                else:
-                    return prefix + str(value)
+            return prefix + _generate_string_from_iterable(value, prefix='i')
+        except TypeError:
+            # not an iterable
+            if isinstance(value, float):
+                return prefix + str(_save_convert_float_to_int(value))
+            else:
+                return prefix + str(value)
 
 
-def _generate_string_from_iterable(l):
+def _generate_string_from_iterable(l, prefix=''):
     """
     Convert an iterable to a string, by extracting every value. Takes
     care of proper handling of floats to avoid rounding errors.
@@ -121,13 +118,15 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
         List of keys to include in conversion.
     """
     if whitelist is None:
-        whitelist = d.keys()
+        whitelist = list(d.keys())
     if blacklist is not None:
-        whitelist = (key for key in whitelist if key not in blacklist)
-
+        whitelist = set(whitelist).difference(blacklist)
     # Sort whitelist according to the keys converted to str
-    return ''.join(_unpack_value(d[key], prefix=prefix + str(key)) for
-                   key in sorted(whitelist, key=str))
+    return ''.join(_unpack_value(d[key],
+                                 whitelist=filter_blackwhitelist(whitelist, key),
+                                 blacklist=filter_blackwhitelist(blacklist, key),
+                                 prefix=prefix + str(key)) for
+                   key in sorted(filter_blackwhitelist(whitelist, None), key=str))
 
 
 def generate_hash_from_dict(d, blacklist=None, whitelist=None,
@@ -152,10 +151,14 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None,
         Dictionary to compute the hash from.
     blacklist : list, optional
         List of keys which *are not* used for generating the hash.
-        Blacklist overrules whitelist, i.e., keys appearing in the
-        blacklist will definitely not be used.
+        Keys of subdirectories can be provided by specifying
+        the full path of keys in a tuple.
     whitelist : list, optional
         List of keys which *are* used for generating the hash.
+        Keys of subdirectories can be provided by specifying
+        the full path of keys in a tuple.
+        Blacklist overrules whitelist, i.e., keys appearing in the
+        blacklist will definitely not be used.
     raw : bool, optional
           if True, return the unhashed string.
 
@@ -200,6 +203,50 @@ def validate_blackwhitelist(d, l):
         Blacklist or whitelist to validate.
     """
     for key in l:
-        if key not in d:
-            raise KeyError('Key "{key}" not found in dictionary.'
-                           ' Invalid black/whitelist.'.format(key=key))
+        if isinstance(key, tuple):
+            k = key[0]
+        else:
+            k = key
+        if k not in d:
+            raise KeyError('Key "{key}" not found in dictionary. '
+                           'Invalid black/whitelist.'.format(key=key))
+        if isinstance(key, tuple) and len(key) > 1:
+            validate_blackwhitelist(d[key[0]], [key[1:]])
+
+
+def filter_blackwhitelist(l, key):
+    """
+    Filter black/whitelist for the keys that belong to the
+    subdirectory which is embedded into the nested dictionary
+    structure with the given key.
+
+    Three different cases:
+    - if l is None, then return none
+    - if key is None, then we are at the top-level dictionary, thus
+      include all scalar keys and the first element of tuples.
+    - if key is not None, then return only the keys that are tuples
+      where the first element of the tuple matches the given key
+
+    Parameters
+    ----------
+    l : list
+        Black- or whitelist to filter
+    key : scalar variable or None
+        Key to filter for. See above for the behavior if key is None
+    """
+    if l is None:
+        return None
+    else:
+        fl = []
+        for k in l:
+            if isinstance(k, tuple):
+                if key is not None and k[0] == key:
+                    fl.append(k[1])
+                elif key is None:
+                    fl.append(k[0])
+            elif key is None:
+                fl.append(k)
+        if len(fl) == 0:
+            return None
+        else:
+            return fl

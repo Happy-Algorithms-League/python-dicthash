@@ -322,6 +322,31 @@ def test_store_and_rehash_h5py():
     assert(hash0 == hash1)
 
 
+def test_subdir_keys_for_whitelist_blacklist():
+    d0 = {'a': {'b': 1,
+                'c': 2},
+          'd': 1}
+    d1 = {'a': {'b': 1,
+                'c': 3},
+          'd': 1}
+
+    label0 = dicthash.generate_hash_from_dict(d0, blacklist=[('a', 'c')])
+    label1 = dicthash.generate_hash_from_dict(d1, blacklist=[('a', 'c')])
+    assert(label0 == label1)
+
+    label0 = dicthash.generate_hash_from_dict(d0, blacklist=[('a', 'b')])
+    label1 = dicthash.generate_hash_from_dict(d1, blacklist=[('a', 'b')])
+    assert(label0 != label1)
+
+    label0 = dicthash.generate_hash_from_dict(d0, whitelist=[('a', 'c')])
+    label1 = dicthash.generate_hash_from_dict(d1, whitelist=[('a', 'c')])
+    assert(label0 != label1)
+
+    label0 = dicthash.generate_hash_from_dict(d0, whitelist=[('a', 'b')])
+    label1 = dicthash.generate_hash_from_dict(d1, whitelist=[('a', 'b')])
+    assert(label0 == label1)
+
+
 def test_dict_list_lead_to_different_hash():
     d0 = {
         'a': ['b', 5],
