@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 """
-DictHash.hash
+dicthash.dicthash
 =============
 
 A module implementing an md5 hash function for (nested) dictionaries.
@@ -9,7 +7,8 @@ A module implementing an md5 hash function for (nested) dictionaries.
 Functions
 ---------
 
-generate_hash_from_dict - generate an md5 hash from a (nested) dictionary
+generate_hash_from_dict - generate an md5 hash from a (nested)
+dictionary
 
 """
 
@@ -29,14 +28,20 @@ except NameError:
 
 
 def _save_convert_float_to_int(x):
-    """convert a float x to and int. avoid rounding errors on different
+    """
+    Convert a float x to an integer. Avoid rounding errors on different
     platforms by shifting the floating point behind the last relevant
     digit.
 
+    Parameters
+    ----------
+    x : float
+        Float to be converted.
     """
     if abs(x) > 0. and abs(x) < 1. / FLOAT_FACTOR:
         if not FLOOR_SMALL_FLOATS:
-            raise ValueError('Float too small for safe conversion to integer.')
+            raise ValueError('Float too small for safe conversion to '
+                             'integer.')
         else:
             x = 0.
             warnings.warn('Float too small for safe conversion to'
@@ -45,6 +50,26 @@ def _save_convert_float_to_int(x):
 
 
 def _unpack_value(value, prefix=''):
+    """
+    Unpack values from a data structure and convert to string. Call
+    the corresponding functions for dict or iterables or use simple
+    string conversion for scalar variables.
+
+    Parameters
+    ----------
+    value : dict, iterable, scalar variable
+        Value to be unpacked.
+    prefix : str, optional
+        Prefix to preprend to resulting string. Defaults to empty
+        string.
+    """
+    try:
+        return _generate_string_from_dict(value,
+                                          blacklist=None,
+                                          whitelist=None,
+                                          prefix=prefix)
+    except AttributeError:
+        # not a dict
         try:
             return _generate_string_from_dict(value, blacklist=None, whitelist=None, prefix=prefix + 'd')
         except AttributeError:
@@ -59,11 +84,17 @@ def _unpack_value(value, prefix=''):
                     return prefix + str(value)
 
 
-def _generate_string_from_iterable(l, prefix=''):
-    """convert a list to a string, by extracting every value. takes care
-    of proper handling of floats to avoid rounding errors.
-
+def _generate_string_from_iterable(l):
     """
+    Convert an iterable to a string, by extracting every value. Takes
+    care of proper handling of floats to avoid rounding errors.
+
+    Parameters
+    ----------
+    l : iterable
+        Iterable to be converted.
+    """
+
     # we need to handle strings separately to avoid infinite recursion
     # due to their iterable property
     if isinstance(l, basestring):
@@ -73,10 +104,21 @@ def _generate_string_from_iterable(l, prefix=''):
 
 
 def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
-    """convert a dictionary to a string, by extracting every key value
-    pair. takes care of proper handling of floats, lists and nested
+    """
+    Convert a dictionary to a string, by extracting every key value
+    pair. Takes care of proper handling of floats, iterables and nested
     dictionaries.
 
+    Parameters
+    ----------
+    d : dict
+        Dictionary to be converted
+    blacklist : list
+        List of keys to exclude from conversion. Blacklist overrules
+        whitelist, i.e., keys appearing in the blacklist will
+        definitely not be used.
+    whitelist: list
+        List of keys to include in conversion.
     """
     if whitelist is None:
         whitelist = d.keys()
@@ -88,11 +130,12 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
                    key in sorted(whitelist, key=str))
 
 
-def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
+def generate_hash_from_dict(d, blacklist=None, whitelist=None,
+                            raw=False):
     """
     Generate an md5 hash from a (nested) dictionary.
 
-    Takes care of extracting nested dictionaries, lists and arrays and
+    Takes care of extracting nested dictionaries, iterables and
     avoids rounding errors of floats. Makes sure keys are read in a
     unique order. A blacklist of keys can be passed, that can contain
     keys which should be excluded from the hash. If a whitelist is
@@ -105,12 +148,14 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
 
     Parameters
     ----------
-    d : dictionary object
+    d : dict
         Dictionary to compute the hash from.
     blacklist : list, optional
-                List of keys which *are not* used for generating the hash.
+        List of keys which *are not* used for generating the hash.
+        Blacklist overrules whitelist, i.e., keys appearing in the
+        blacklist will definitely not be used.
     whitelist : list, optional
-                List of keys which *are* used for generating the hash.
+        List of keys which *are* used for generating the hash.
     raw : bool, optional
           if True, return the unhashed string.
 
@@ -143,8 +188,18 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None, raw=False):
 
 
 def validate_blackwhitelist(d, l):
-    """validates that all entries in black/whitelist l, appear in the
-    dictionary d"""
+    """
+    Validate that all entries in black/whitelist l, appear in the
+    dictionary d
+
+    Parameters
+    ----------
+    d : dict
+        Dictionary to use for validation.
+    l : list
+        Blacklist or whitelist to validate.
+    """
     for key in l:
         if key not in d:
-            raise KeyError('Key "{key}" not found in dictionary. Invalid black/whitelist.'.format(key=key))
+            raise KeyError('Key "{key}" not found in dictionary.'
+                           ' Invalid black/whitelist.'.format(key=key))
