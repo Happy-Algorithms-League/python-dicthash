@@ -6,14 +6,14 @@
 Welcome to python-dicthash's documentation!
 ===========================================
 
-Conveniently generate portable md5 hashes from (arbitrarily nested)
+Generate portable md5 hashes from (arbitrarily nested)
 dictionaries. These dictionaries can contain arbitrary Python and
 NumPy data types. The goal of the module is to provide a hash function
 that can be safely used across different platforms. Its main use is to
 generate unique identifiers for parameter dictionaries used in
 parameter scans of neural network simulations.
 
-It exposes just a single function to the user: `generate_hash_from_dict`.
+It exposes a single function to the user: `generate_hash_from_dict`.
 
 
 API reference
@@ -22,6 +22,13 @@ API reference
 
    api_reference
 
+
+Release Notes
+=============
+.. toctree::
+   :maxdepth: 1
+
+   release_notes
 
 Indices and tables
 ==================
