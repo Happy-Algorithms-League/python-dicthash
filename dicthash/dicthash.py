@@ -153,10 +153,12 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None,
         List of keys which *are not* used for generating the hash.
         Keys of subdirectories can be provided by specifying
         the full path of keys in a tuple.
+        If None, no keys will be ignored.
     whitelist : list, optional
         List of keys which *are* used for generating the hash.
         Keys of subdirectories can be provided by specifying
         the full path of keys in a tuple.
+        If None, all keys will be used.
         Blacklist overrules whitelist, i.e., keys appearing in the
         blacklist will definitely not be used.
     raw : bool, optional
@@ -170,10 +172,10 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None,
 
     Example
     -------
-    >>> import dicthash.dicthash as dhsh
+    >>> from dicthash import generate_hash_from_dict
     >>> d = {'a': 'asd', 'b': 0.12, 3: {'c': [3, 4, 5]}}
-    >>> dhsh.generate_hash_from_dict(d)
-    '6725c9cd61278978b124dbd61a1cfb6a'
+    >>> generate_hash_from_dict(d)
+    'd748bbf148db514911ed0bf215729d01'
 
     """
     if not isinstance(d, dict):
