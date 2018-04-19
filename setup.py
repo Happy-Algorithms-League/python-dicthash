@@ -11,6 +11,7 @@ setup(
     keywords='hashing hash',
     url='https://github.com/INM-6/python-dicthash',
     python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*, !=3.4.*, <4',
+    install_requires=['future'],
     packages=['dicthash'],
     long_description=open('README.md').read(),
     classifiers=[
