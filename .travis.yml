@@ -15,12 +15,12 @@ before_install:
   - source activate myenv
   - pip install --upgrade pip
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy nose h5py
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy
   - pip install --upgrade quantities future
   - pip install pytest pytest-cov coveralls
   - pip install h5py_wrapper
 script:
-  - pytest
+  - pytest --cov=dicthash
 after_success:
   - coveralls
 
