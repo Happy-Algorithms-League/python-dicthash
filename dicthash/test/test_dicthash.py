@@ -224,6 +224,17 @@ def test_blacklist():
     assert(hash0 != hash1)
 
 
+def test_blacklist_all_keys():
+    d0 = {'a': 1,
+          'b': 2}
+    d1 = {}
+
+    hash0 = dicthash.generate_hash_from_dict(d0, blacklist=['a', 'b'])
+    hash1 = dicthash.generate_hash_from_dict(d1)
+    
+    assert(hash0 == hash1)
+
+
 def test_whitelist():
     d0 = {
         'a': [1, 2, 3],
