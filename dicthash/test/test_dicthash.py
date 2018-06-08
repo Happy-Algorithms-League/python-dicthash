@@ -224,6 +224,17 @@ def test_blacklist():
     assert(hash0 != hash1)
 
 
+def test_blacklist_all_keys():
+    d0 = {'a': 1,
+          'b': 2}
+    d1 = {}
+
+    hash0 = dicthash.generate_hash_from_dict(d0, blacklist=['a', 'b'])
+    hash1 = dicthash.generate_hash_from_dict(d1)
+    
+    assert(hash0 == hash1)
+
+
 def test_whitelist():
     d0 = {
         'a': [1, 2, 3],
@@ -345,6 +356,15 @@ def test_subdir_keys_for_whitelist_blacklist():
     label0 = dicthash.generate_hash_from_dict(d0, whitelist=[('a', 'b')])
     label1 = dicthash.generate_hash_from_dict(d1, whitelist=[('a', 'b')])
     assert(label0 == label1)
+
+    # Test with one more level in the dictionaries
+    d0 = {'e': {'f': {'g': 2,
+                      'h': 4}}}
+    d1 = {'e': {'f': {'g': 3,
+                      'h': 4}}}
+    label0 = dicthash.generate_hash_from_dict(d0, blacklist=[('e', 'f', 'h')])
+    label1 = dicthash.generate_hash_from_dict(d1, blacklist=[('e', 'f', 'h')])
+    assert(label0 != label1)
 
 
 def test_dict_list_lead_to_different_hash():

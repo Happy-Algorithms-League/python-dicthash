@@ -122,11 +122,14 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
     if blacklist is not None:
         whitelist = set(whitelist).difference(blacklist)
     # Sort whitelist according to the keys converted to str
-    return ''.join(_unpack_value(d[key],
-                                 whitelist=filter_blackwhitelist(whitelist, key),
-                                 blacklist=filter_blackwhitelist(blacklist, key),
-                                 prefix=prefix + str(key)) for
-                   key in sorted(filter_blackwhitelist(whitelist, None), key=str))
+    if len(whitelist) > 0:
+        return ''.join(_unpack_value(d[key],
+                                     whitelist=filter_blackwhitelist(whitelist, key),
+                                     blacklist=filter_blackwhitelist(blacklist, key),
+                                     prefix=prefix + str(key)) for
+                       key in sorted(filter_blackwhitelist(whitelist, None), key=str))
+    else:
+        return ''
 
 
 def generate_hash_from_dict(d, blacklist=None, whitelist=None,
@@ -243,7 +246,10 @@ def filter_blackwhitelist(l, key):
         for k in l:
             if isinstance(k, tuple):
                 if key is not None and k[0] == key:
-                    fl.append(k[1])
+                    if len(k) == 2:
+                        fl.append(k[1])
+                    else:
+                        fl.append(k[1:])
                 elif key is None:
                     fl.append(k[0])
             elif key is None:
