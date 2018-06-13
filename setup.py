@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='dicthash',
-    version='0.0.1',
+    version='0.0.2',
     author='Jakob Jordan, Maximilian Schmidt',
     author_email='j.jordan@fz-juelich.de',
     description=('Generate portable md5 hashes from (arbitrarily nested) dictionaries.'),
