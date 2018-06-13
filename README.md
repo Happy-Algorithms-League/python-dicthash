@@ -25,6 +25,8 @@ The user can set two global parameters:
 
 ![Python2.7](https://img.shields.io/badge/python-2.7-blue.svg)
 ![Python3.6](https://img.shields.io/badge/python-3.6-blue.svg)
+[![PyPI version fury.io](https://d25lcipzij17d.cloudfront.net/badge.svg?id=py&type=6&v=0.0.2&x2=0)](https://pypi.org/project/dicthash/)
+[![GPL license](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 
 Code status
 ===========
