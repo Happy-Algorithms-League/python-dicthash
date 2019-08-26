@@ -52,6 +52,15 @@ def test_error_for_failing_float_conversion():
     with pytest.raises(ValueError):
         dicthash.generate_hash_from_dict(d3)
 
+def test_floor_small_floats_throws_warning():
+    d = {'a': 1.e-16}
+
+    dicthash.FLOOR_SMALL_FLOATS = True
+    with pytest.warns(UserWarning):
+        dicthash.generate_hash_from_dict(d)
+    # Reset FLOOR_SMALL_FLOATS to default behavior
+    dicthash.FLOOR_SMALL_FLOATS = False
+    
 def test_shuffled_whitelist_leads_to_same_hash():
     d0 = {
         'a': [1, 2, 3],
