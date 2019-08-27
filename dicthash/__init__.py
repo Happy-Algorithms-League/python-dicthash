@@ -17,4 +17,4 @@ It exposes a single function to the user `dicthash.generate_hash_from_dict`.
 
 from .dicthash import generate_hash_from_dict
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
