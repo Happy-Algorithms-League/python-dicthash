@@ -11,8 +11,6 @@ generate_hash_from_dict - generate an md5 hash from a (nested)
 dictionary
 
 """
-
-from future.builtins import str
 import hashlib
 import warnings
 FLOAT_FACTOR = 1e15
@@ -20,11 +18,6 @@ FLOOR_SMALL_FLOATS = False
 
 # user warnings are printed to sys.stdout
 warnings.simplefilter('default', category=UserWarning)
-
-try:
-    basestring  # attempt to evaluate basestring
-except NameError:
-    basestring = str
 
 
 def _save_convert_float_to_int(x):
@@ -94,7 +87,7 @@ def _generate_string_from_iterable(l, prefix=''):
 
     # we need to handle strings separately to avoid infinite recursion
     # due to their iterable property
-    if isinstance(l, basestring):
+    if isinstance(l, str):
         return ''.join((prefix, str(l)))
     else:
         return ''.join(_unpack_value(value, prefix='') for value in l)
