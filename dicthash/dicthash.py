@@ -13,6 +13,9 @@ dictionary
 """
 import hashlib
 import warnings
+
+from typing import overload, List, Union, Iterable, Optional, Hashable
+
 FLOAT_FACTOR = 1e15
 FLOOR_SMALL_FLOATS = False
 
@@ -20,7 +23,7 @@ FLOOR_SMALL_FLOATS = False
 warnings.simplefilter('default', category=UserWarning)
 
 
-def _save_convert_float_to_int(x):
+def _save_convert_float_to_int(x: float) -> int:
     """
     Convert a float x to an integer. Avoid rounding errors on different
     platforms by shifting the floating point behind the last relevant
@@ -42,7 +45,9 @@ def _save_convert_float_to_int(x):
     return int(x * FLOAT_FACTOR)
 
 
-def _unpack_value(value, prefix='', whitelist=None, blacklist=None):
+def _unpack_value(value: Union[dict, Iterable, float, int],
+                  prefix: str ='', whitelist: Optional[List[Hashable]] =None,
+                  blacklist: Optional[List[Hashable]]=None) -> str:
     """
     Unpack values from a data structure and convert to string. Call
     the corresponding functions for dict or iterables or use simple
@@ -50,23 +55,28 @@ def _unpack_value(value, prefix='', whitelist=None, blacklist=None):
 
     Parameters
     ----------
-    value : dict, iterable, scalar variable
+    value : Union[dict, Iterable, float, int]
         Value to be unpacked.
     prefix : str, optional
         Prefix to preprend to resulting string. Defaults to empty
         string.
+
+    Returns
+    -------
+    str
+        Unpacked values.
     """
 
-    try:
+    if isinstance(value, dict):
         return _generate_string_from_dict(value,
                                           blacklist=blacklist,
                                           whitelist=whitelist,
                                           prefix=prefix + 'd')
-    except AttributeError:
+    else:
         # not a dict
-        try:
+        if isinstance(value, Iterable):
             return prefix + _generate_string_from_iterable(value, prefix='i')
-        except TypeError:
+        else:
             # not an iterable
             if isinstance(value, float):
                 return prefix + str(_save_convert_float_to_int(value))
@@ -74,14 +84,14 @@ def _unpack_value(value, prefix='', whitelist=None, blacklist=None):
                 return prefix + str(value)
 
 
-def _generate_string_from_iterable(l, prefix=''):
+def _generate_string_from_iterable(l: Iterable, prefix: str ='') -> str:
     """
     Convert an iterable to a string, by extracting every value. Takes
     care of proper handling of floats to avoid rounding errors.
 
     Parameters
     ----------
-    l : iterable
+    l : Iterable
         Iterable to be converted.
     """
 
@@ -93,7 +103,8 @@ def _generate_string_from_iterable(l, prefix=''):
         return ''.join(_unpack_value(value, prefix='') for value in l)
 
 
-def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
+def _generate_string_from_dict(d: dict, blacklist: Optional[List[Hashable]] = None,
+                               whitelist: Optional[List[Hashable]] = None, prefix: str ='') ->str:
     """
     Convert a dictionary to a string, by extracting every key value
     pair. Takes care of proper handling of floats, iterables and nested
@@ -103,19 +114,19 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
     ----------
     d : dict
         Dictionary to be converted
-    blacklist : list
+    blacklist : List[Hashable], optional
         List of keys to exclude from conversion. Blacklist overrules
         whitelist, i.e., keys appearing in the blacklist will
         definitely not be used.
-    whitelist: list
+    whitelist: list, optional
         List of keys to include in conversion.
     """
     if whitelist is None:
         whitelist = list(d.keys())
     if blacklist is not None:
-        whitelist = set(whitelist).difference(blacklist)
+        whitelist = list(set(whitelist).difference(blacklist))
     # Sort whitelist according to the keys converted to str
-    if len(whitelist) > 0:
+    if len(whitelist) > 0 and whitelist is not None:
         return ''.join(_unpack_value(d[key],
                                      whitelist=filter_blackwhitelist(whitelist, key),
                                      blacklist=filter_blackwhitelist(blacklist, key),
@@ -125,8 +136,9 @@ def _generate_string_from_dict(d, blacklist, whitelist, prefix=''):
         return ''
 
 
-def generate_hash_from_dict(d, blacklist=None, whitelist=None,
-                            raw=False):
+def generate_hash_from_dict(d: dict, blacklist: Optional[List[Hashable]] = None,
+                            whitelist: Optional[List[Hashable]] = None,
+                            raw: bool = False) -> str:
     """
     Generate an md5 hash from a (nested) dictionary.
 
@@ -145,12 +157,12 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None,
     ----------
     d : dict
         Dictionary to compute the hash from.
-    blacklist : list, optional
+    blacklist : List[Hashable], optional
         List of keys which *are not* used for generating the hash.
         Keys of subdirectories can be provided by specifying
         the full path of keys in a tuple.
         If None, no keys will be ignored.
-    whitelist : list, optional
+    whitelist : List[Hashable], optional
         List of keys which *are* used for generating the hash.
         Keys of subdirectories can be provided by specifying
         the full path of keys in a tuple.
@@ -162,7 +174,7 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None,
 
     Returns
     -------
-    : string
+    str
       The hash generated from the dictionary, or the unhashed string if
       raw is True.
 
@@ -188,7 +200,7 @@ def generate_hash_from_dict(d, blacklist=None, whitelist=None,
         return hashlib.md5(raw_string.encode('utf-8')).hexdigest()
 
 
-def validate_blackwhitelist(d, l):
+def validate_blackwhitelist(d: dict, l: list) -> None:
     """
     Validate that all entries in black/whitelist l, appear in the
     dictionary d
@@ -199,6 +211,10 @@ def validate_blackwhitelist(d, l):
         Dictionary to use for validation.
     l : list
         Blacklist or whitelist to validate.
+
+    Returns
+    -------
+    None
     """
     for key in l:
         if isinstance(key, tuple):
@@ -212,14 +228,24 @@ def validate_blackwhitelist(d, l):
             validate_blackwhitelist(d[key[0]], [key[1:]])
 
 
-def filter_blackwhitelist(l, key):
+@overload
+def filter_blackwhitelist(l: None, key: Optional[Hashable]) -> None:
+    pass
+
+
+@overload
+def filter_blackwhitelist(l: list, key: Optional[Hashable]) -> list:
+    pass
+
+
+def filter_blackwhitelist(l: Optional[list], key: Optional[Hashable]) -> Union[list, None]:
     """
     Filter black/whitelist for the keys that belong to the
     subdirectory which is embedded into the nested dictionary
     structure with the given key.
 
     Three different cases:
-    - if l is None, then return none
+    - if l is None, then return None
     - if key is None, then we are at the top-level dictionary, thus
       include all scalar keys and the first element of tuples.
     - if key is not None, then return only the keys that are tuples
@@ -229,7 +255,7 @@ def filter_blackwhitelist(l, key):
     ----------
     l : list
         Black- or whitelist to filter
-    key : scalar variable or None
+    key : Hashable, optional
         Key to filter for. See above for the behavior if key is None
     """
     if l is None:
