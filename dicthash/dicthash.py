@@ -46,8 +46,8 @@ def _save_convert_float_to_int(x: float) -> int:
 
 
 def _unpack_value(value: Union[dict, Iterable, float, int],
-                  prefix: str ='', whitelist: Optional[List[Hashable]] =None,
-                  blacklist: Optional[List[Hashable]]=None) -> str:
+                  prefix: str = '', whitelist: Optional[List[Hashable]] = None,
+                  blacklist: Optional[List[Hashable]] = None) -> str:
     """
     Unpack values from a data structure and convert to string. Call
     the corresponding functions for dict or iterables or use simple
@@ -84,7 +84,7 @@ def _unpack_value(value: Union[dict, Iterable, float, int],
                 return prefix + str(value)
 
 
-def _generate_string_from_iterable(l: Iterable, prefix: str ='') -> str:
+def _generate_string_from_iterable(l: Iterable, prefix: str = '') -> str:
     """
     Convert an iterable to a string, by extracting every value. Takes
     care of proper handling of floats to avoid rounding errors.
@@ -104,7 +104,7 @@ def _generate_string_from_iterable(l: Iterable, prefix: str ='') -> str:
 
 
 def _generate_string_from_dict(d: dict, blacklist: Optional[List[Hashable]] = None,
-                               whitelist: Optional[List[Hashable]] = None, prefix: str ='') ->str:
+                               whitelist: Optional[List[Hashable]] = None, prefix: str = '') ->str:
     """
     Convert a dictionary to a string, by extracting every key value
     pair. Takes care of proper handling of floats, iterables and nested
