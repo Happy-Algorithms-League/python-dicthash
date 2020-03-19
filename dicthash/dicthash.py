@@ -126,7 +126,7 @@ def _generate_string_from_dict(d: dict, blacklist: Optional[List[Hashable]] = No
     if blacklist is not None:
         whitelist = list(set(whitelist).difference(blacklist))
     # Sort whitelist according to the keys converted to str
-    if len(whitelist) > 0 and whitelist is not None:
+    if len(whitelist) > 0:
         return ''.join(_unpack_value(d[key],
                                      whitelist=filter_blackwhitelist(whitelist, key),
                                      blacklist=filter_blackwhitelist(blacklist, key),
