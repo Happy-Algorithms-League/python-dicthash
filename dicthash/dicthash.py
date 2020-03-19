@@ -118,7 +118,7 @@ def _generate_string_from_dict(d: dict, blacklist: Optional[List[Hashable]] = No
         List of keys to exclude from conversion. Blacklist overrules
         whitelist, i.e., keys appearing in the blacklist will
         definitely not be used.
-    whitelist: list, optional
+    whitelist: List[Hashable], optional
         List of keys to include in conversion.
     """
     if whitelist is None:
