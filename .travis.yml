@@ -20,8 +20,10 @@ install:
   - pip install --upgrade quantities future
   - pip install pytest pytest-cov coveralls
   - pip install h5py_wrapper
+  - pip install mypy
 script:
   - pytest --cov=dicthash
+  - mypy dicthash/dicthash.py
 after_success:
   - coveralls
 
