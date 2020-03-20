@@ -35,3 +35,4 @@ Code status
 
 [![Build Status](https://travis-ci.org/INM-6/python-dicthash.svg?branch=master)](https://travis-ci.org/INM-6/python-dicthash)
 [![Coverage Status](https://coveralls.io/repos/github/INM-6/python-dicthash/badge.svg?branch=master)](https://coveralls.io/github/INM-6/python-dicthash?branch=master)
+[![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
