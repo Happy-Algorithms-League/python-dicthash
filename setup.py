@@ -7,7 +7,7 @@ setup(
     author='Jakob Jordan, Maximilian Schmidt',
     author_email='j.jordan@fz-juelich.de',
     description=('Generate portable md5 hashes from (arbitrarily nested) dictionaries.'),
-    license='MIT',
+    license='GPLv2',
     keywords='hashing hash',
     url='https://github.com/INM-6/python-dicthash',
     python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*, !=3.4.*, <4',
